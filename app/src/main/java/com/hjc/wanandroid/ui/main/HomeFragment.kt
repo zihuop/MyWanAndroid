@@ -25,7 +25,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private lateinit var bannerAdapter: BannerAdapter
     private lateinit var articleAdapter: ArticleAdapter
-    private val mViewModel by viewModel<MainViewModel>()
+    private val mViewModel by viewModel<HomeViewModel>()
 
 
     override fun getViewBinding(
@@ -50,8 +50,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun initDatas() {
         binding.button.setOnClickListener {
-            mViewModel.sendUiIntent(MainIntent.GetBanner)
-            mViewModel.sendUiIntent(MainIntent.GetDetail(0))
+            mViewModel.sendUiIntent(HomeViewIntent.GetBanner)
+            mViewModel.sendUiIntent(HomeViewIntent.GetDetail(0))
+//            mViewModel.sendUiIntent(HomeViewIntent.Combine(0))
         }
 
         lifecycleScope.launchWhenStarted {

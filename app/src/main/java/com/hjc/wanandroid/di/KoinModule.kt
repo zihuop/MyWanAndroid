@@ -1,7 +1,7 @@
 package com.hjc.wanandroid.di
 
 import com.hjc.wanandroid.model.respository.HomeRepository
-import com.hjc.wanandroid.ui.main.MainViewModel
+import com.hjc.wanandroid.ui.main.HomeViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -17,7 +17,7 @@ val repoModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { MainViewModel(get()) }
+    viewModel { HomeViewModel(get()) }
 }
 
 val appModule = listOf(viewModelModule, repoModule)

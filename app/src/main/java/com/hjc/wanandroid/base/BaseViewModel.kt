@@ -17,29 +17,25 @@ abstract class BaseViewModel<UiState : IUiState, UiIntent : IUiIntent> : ViewMod
     private val _uiStateFlow = MutableStateFlow(initUiState())
     val uiStateFlow: StateFlow<UiState> = _uiStateFlow
 
-    protected abstract fun initUiState(): UiState
-
-    protected fun sendUiState(copy: UiState.() -> UiState) {
-        _uiStateFlow.update { copy(_uiStateFlow.value) }
-    }
-
     private val _uiIntentFlow: Channel<UiIntent> = Channel()
     val uiIntentFlow: Flow<UiIntent> = _uiIntentFlow.receiveAsFlow()
 
     private val _loadUiIntentFlow: Channel<LoadUiIntent> = Channel()
     val loadUiIntentFlow: Flow<LoadUiIntent> = _loadUiIntentFlow.receiveAsFlow()
 
+    init {
+        viewModelScope.launch { uiIntentFlow.collect { handleIntent(it) } }
+    }
+
+    protected abstract fun initUiState(): UiState
+
+    protected fun sendUiState(copy: UiState.() -> UiState) {
+        _uiStateFlow.update { copy(_uiStateFlow.value) }
+    }
+
     fun sendUiIntent(uiIntent: UiIntent) {
         viewModelScope.launch {
             _uiIntentFlow.send(uiIntent)
-        }
-    }
-
-    init {
-        viewModelScope.launch {
-            uiIntentFlow.collect {
-                handleIntent(it)
-            }
         }
     }
 
@@ -48,10 +44,18 @@ abstract class BaseViewModel<UiState : IUiState, UiIntent : IUiIntent> : ViewMod
     /**
      * 发送当前加载状态：Loading、Error、Normal
      */
-    private fun sendLoadUiIntent(loadUiIntent: LoadUiIntent) {
+    fun sendLoadUiIntent(loadUiIntent: LoadUiIntent) {
         viewModelScope.launch {
             _loadUiIntentFlow.send(loadUiIntent)
         }
+    }
+
+    protected fun <T : Any> requestDataWithFlow(
+        request: suspend () -> BaseData<T>,
+        successCallback: (T) -> Unit,
+        failCallback: suspend (String) -> Unit,
+    ) {
+        requestDataWithFlow(true, request, successCallback, failCallback)
     }
 
     protected fun <T : Any> requestDataWithFlow(
