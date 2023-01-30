@@ -74,6 +74,7 @@ class HomeViewModel(private val homeRepo: HomeRepository) :
                         //处理结果
                         println("it = $it")
                     }
+                    .onCompletion { Log.d("TEST", "loadUiStateFlow4444") }
                     .launchIn(viewModelScope)
                     .start()
             }
